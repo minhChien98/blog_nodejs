@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Chat Application</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- socket io -->
+    <script src='http://localhost:3000/socket.io/socket.io.js'></script>
+    <script src='http://code.jquery.com/jquery-1.10.1.min.js'></script>
+
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font: 13px Helvetica, Arial; }
+        form { padding: 3px; position: fixed; bottom: 30px; width: 80%; }
+        form input { border: solid; padding: 10px; width: 90%; margin-right: .5%; }
+        
+        #conversation { list-style-type: none; margin: 0; padding: 0; }
+        #conversation li { padding: 5px 10px; }
+        #conversation li:nth-child(odd) { background: #eee; }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <ul id="conversation">
+
+        </ul>
+        <form action="">
+            <input type="text" name="message" id="message">
+            <button class="btn btn-success" id="btn_send">Send</button>
+        </form>
+    </div>
+
+    <script href="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
+    <script type="text/javascript">
+        var socket = io.connect("http://localhost:3000");
+
+        socket.on("connect", function(){
+            console.log("ket noi server dc");
+            //ask name
+            var username = prompt("Tên bạn là gì?");
+            socket.emit("addUser",username);
+
+        });
+
+        
+        //listen updateMessage
+        socket.on("updateMessage", function(data){
+            $("#conversation").append("<li><b>" + data.sender + ": </b>" + data.message + "</li>");
+        });
+
+        //send message event
+        $("#btn_send").click(function(e){
+            var message = $("#message").val();
+            $("#message").val("");
+            if(message.trim().length != 0){
+                socket.emit("sendMessage", message);
+            }
+        });
+        
+
+        $("form").submit(function(){
+            return false;
+        });
+    </script>
+
+</body>
+</html>
